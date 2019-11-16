@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 14 23:48:32 2019
+Created on Fri Nov 15 01:41:37 2019
 
 @author: claudedavid
 """
+
 # First we'll import the os module
 # This will allow us to create file paths across operating systems
 import os
@@ -13,78 +14,76 @@ import os
 import csv
 
 # Make a path for the CSV file
-budget= os.path.join("/Users/claudedavid/Desktop/budget_python.csv")
+election_data = os.path.join("/Users/claudedavid/Desktop/election_data.csv")
 
-total_months = 0
-total_pl = 0
-value = 0
-change = 0
-dates = []
-profits = []
+# A list to capture the names of candidates
+candidates = []
 
-# Opening and reading hte CSV file
-with open(budget, newline='') as budgetcsvfile:
+# A list to capture the number of votes each candidate receives
+num_votes = []
 
-    # CSV reader specifies delimiter and variable that holds contents
-    budgetcsvreader = csv.reader(budgetcsvfile, delimiter=',')
-    print(budgetcsvreader)
+# A list to capture the percentage of total votes each candidate garners 
+percent_votes = []
 
-    # Read the header row first (skip this step if there is now header)
-    budgetcsv_header = next(budgetcsvreader)
-    print(f"CSV Header: {budgetcsv_header}")
-   
-    #Reading the first row (so that we track the changes properly)
-    first_row = next(budgetcsvreader)
-    total_months += 1
-    total_pl += int(first_row[1])
-    value = int(first_row[1])
+# A counter for the total number of votes 
+total_votes = 0
+
+with open(election_data, newline = "") as csvfile:
+    csvreader = csv.reader(csvfile, delimiter = ",")
+    csv_header = next(csvreader)
+
+    for row in csvreader:
+        # Add to our vote-counter 
+        total_votes += 1 
+
+        '''
+        If the candidate is not on our list, add his/her name to our list, along with 
+        a vote in his/her name.
+        If he/she is already on our list, we will add a vote in his/her
+        name 
+        '''
+        if row[2] not in candidates:
+            candidates.append(row[2])
+            index = candidates.index(row[2])
+            num_votes.append(1)
+        else:
+            index = candidates.index(row[2])
+            num_votes[index] += 1
+
+ # Add to percent_votes list 
+    for votes in num_votes:
+        percentage = (votes/total_votes) * 100
+        percentage = round(percentage)
+        percentage = "%.3f%%" % percentage
+        percent_votes.append(percentage)
     
-    #Going through each row of data after the header & first row 
-    for row in budgetcsvreader:
-        # Keeping track of the dates
-        dates.append(row[0])
-        
-        # Calculate the change, then add it to list of changes
-        change = int(row[1])-value
-        profits.append(change)
-        value = int(row[1])
-        
-        #Total number of months
-        total_months += 1
-
-        #Total net amount of "Profit/Losses over entire period"
-        total_pl = total_pl + int(row[1])
-
- #Greatest increase in profits
-    greatest_increase = max(profits)
-    greatest_index = profits.index(greatest_increase)
-    greatest_date = dates[greatest_index]
-
-    #Greatest decrease (lowest increase) in profits 
-    greatest_decrease = min(profits)
-    worst_index = profits.index(greatest_decrease)
-    worst_date = dates[worst_index]
-
-    #Average change in "Profit/Losses between months over entire period"
-    avg_change = sum(profits)/len(profits)
+    # Find the winning candidate
+    winner = max(num_votes)
+    index = num_votes.index(winner)
+    winning_candidate = candidates[index]
     
-    #Displaying information
-print("Financial Analysis")
-print("---------------------")
-print(f"Total Months: {str(total_months)}")
-print(f"Total: ${str(total_pl)}")
-print(f"Average Change: ${str(round(avg_change,2))}")
-print(f"Greatest Increase in Profits: {greatest_date} (${str(greatest_increase)})")
-print(f"Greatest Decrease in Profits: {worst_date} (${str(greatest_decrease)})")
+    # Displaying the results
+print("Election Results")
+print("--------------------------")
+print(f"Total Votes: {str(total_votes)}")
+print("--------------------------")
+for i in range(len(candidates)):
+    print(f"{candidates[i]}: {str(percent_votes[i])} ({str(num_votes[i])})")
+print("--------------------------")
+print(f"Winner: {winning_candidate}")
+print("--------------------------")
 
-#Exporing to .txt file
+# Exporting to .txt file
 output = open("output.txt", "w")
-
-line1 = "Financial Analysis"
-line2 = "---------------------"
-line3 = str(f"Total Months: {str(total_months)}")
-line4 = str(f"Total: ${str(total_pl)}")
-line5 = str(f"Average Change: ${str(round(avg_change,2))}")
-line6 = str(f"Greatest Increase in Profits: {greatest_date} (${str(greatest_increase)})")
-line7 = str(f"Greatest Decrease in Profits: {worst_date} (${str(greatest_decrease)})")
-output.write('{}\n{}\n{}\n{}\n{}\n{}\n{}\n'.format(line1,line2,line3,line4,line5,line6,line7))
+line1 = "Election Results"
+line2 = "--------------------------"
+line3 = str(f"Total Votes: {str(total_votes)}")
+line4 = str("--------------------------")
+output.write('{}\n{}\n{}\n{}\n'.format(line1, line2, line3, line4))
+for i in range(len(candidates)):
+    line = str(f"{candidates[i]}: {str(percent_votes[i])} ({str(num_votes[i])})")
+    output.write('{}\n'.format(line))
+line5 = "--------------------------"
+line6 = str(f"Winner: {winning_candidate}")
+line7 = "--------------------------"
+output.write('{}\n{}\n{}\n'.format(line5, line6, line7))
