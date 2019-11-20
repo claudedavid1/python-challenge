@@ -13,7 +13,7 @@ import os
 import csv
 
 # Make a path for the CSV file
-budget= os.path.join("/Users/claudedavid/Desktop/budget_python.csv")
+budget= os.path.join("Resources", "budget_python.csv")
 
 total_months = 0
 total_pl = 0
