@@ -14,7 +14,7 @@ import os
 import csv
 
 # Make a path for the CSV file
-election_data = os.path.join("/Users/claudedavid/Desktop/election_data.csv")
+election_data = os.path.join("Resources", "election_data.csv")
 
 # A list to capture the names of candidates
 candidates = []
